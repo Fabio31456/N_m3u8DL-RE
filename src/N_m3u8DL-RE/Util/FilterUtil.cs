@@ -57,7 +57,15 @@ namespace N_m3u8DL_RE.Util
             else if (filter.For == "worst" && inputs.Count() > 0)
                 inputs = inputs.TakeLast(1).ToList();
             else if (int.TryParse(bestNumberStr, out int bestNumber) && inputs.Count() > 0)
-                inputs = inputs.Take(bestNumber).ToList();
+            {
+                var langs = inputs.DistinctBy(x => x.Language).Select(x => x.Language);
+                var tmp = new List<StreamSpec>();
+                foreach (var l in langs)
+                {
+                    tmp.Add(inputs.Where(x => x.Language == l).OrderByDescending(a => a.Bandwidth).First());
+                }
+                inputs = tmp.Take(bestNumber).ToList();
+            }
             else if (int.TryParse(worstNumberStr, out int worstNumber) && inputs.Count() > 0)
                 inputs = inputs.TakeLast(worstNumber).ToList();
 
